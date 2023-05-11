@@ -37,7 +37,7 @@ export class App extends Component {
   };
 
   normalizeResponse = response => {
-    const nornalizeData = response.data.hits.map(
+    const normalizeData = response.data.hits.map(
       ({ webformatURL, id, largeImageURL }) => ({
         id: id,
         webURL: webformatURL,
@@ -45,7 +45,7 @@ export class App extends Component {
       })
     );
 
-    return nornalizeData;
+    return normalizeData;
   };
 
   async componentDidUpdate(prevProps, prevState) {
