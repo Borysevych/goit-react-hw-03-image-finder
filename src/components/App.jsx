@@ -1,8 +1,7 @@
 import { Component } from 'react';
 import axios from 'axios';
 import Notiflix from 'notiflix';
-// import PropTypes from 'prop-types';
-
+import PropTypes from 'prop-types';
 
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import { Searchbar } from './Searchbar/Searchbar';
@@ -60,7 +59,7 @@ export class App extends Component {
         const response = await axios.get('/', {
           params: {
             q: nextSearchValue,
-            key: '34825583-0fd8256ee4b8b333aae97f289',
+            key: '31452049-9028b927189bb89bc78a16cd7',
             page: this.state.page,
             per_page: 12,
           },
@@ -132,7 +131,7 @@ export class App extends Component {
   }
 }
 
-// App.propTypes = {
-//   onSubmit: PropTypes.string.isRequired,
-//   searchValue: PropTypes.string.isRequired,
-// };
+App.propTypes = {
+  onSubmit: PropTypes.string.isRequired,
+  searchValue: PropTypes.string.isRequired,
+};

@@ -3,7 +3,7 @@ import {
   ImageGalleryListItem,
   ImageGalleryListItemImage,
 } from './ImageGalleryItem.styled';
-// import PropTypes from 'prop-types';
+import PropTypes from 'prop-types';
 export class ImageGalleryItem extends Component {
   onClickImg = e => {
     return this.props.onClick(e.currentTarget.dataset.image);
@@ -20,6 +20,6 @@ export class ImageGalleryItem extends Component {
   }
 }
 
-// ImageGalleryItem.propTypes = {
-//   onClick: PropTypes.string.isRequired,
-// };
+ImageGalleryItem.propTypes = {
+  onClick: PropTypes.string.isRequired,
+};

@@ -1,7 +1,7 @@
 import { ImageGalleryItem } from 'components/ImageGalleryItem/ImageGalleryItem';
 import { Component } from 'react';
 
-// import PropTypes from 'prop-types';
+import PropTypes from 'prop-types';
 
 import { ImageGalleryList } from './ImageGallery.styled';
 
@@ -27,13 +27,13 @@ export class ImageGallery extends Component {
   }
 }
 
-// ImageGallery.propTypes = {
-//   key: PropTypes.any.isRequired,
-//   onClick: PropTypes.func.isRequired,
-//   dataGalleryItem: PropTypes.shape({
-//     id: PropTypes.any.isRequired,
-//     webURL: PropTypes.string.isRequired,
-//     largeURL: PropTypes.string.isRequired,
-//   }),
-//   onClose: PropTypes.func.isRequired,
-// };
+ImageGallery.propTypes = {
+  key: PropTypes.any.isRequired,
+  onClick: PropTypes.func.isRequired,
+  dataGalleryItem: PropTypes.shape({
+    id: PropTypes.any.isRequired,
+    webURL: PropTypes.string.isRequired,
+    largeURL: PropTypes.string.isRequired,
+  }),
+  onClose: PropTypes.func.isRequired,
+};
