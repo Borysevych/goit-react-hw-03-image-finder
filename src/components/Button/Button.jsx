@@ -1,14 +1,22 @@
-import React from 'react';
-import { ButtonOnClick } from './Button.styled';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 
-export const Button = props => (
-  <ButtonOnClick type="button" onClick={props.onClick}>
-    {props.children}
-  </ButtonOnClick>
-);
+import s from '../Button/Button.module.css';
+
+export class Button extends Component {
+  render() {
+    return (
+      <button
+        type="button"
+        className={s.Button}
+        onClick={this.props.onNextPage}
+      >
+        Load more
+      </button>
+    );
+  }
+}
 
 Button.propTypes = {
-  onClick: PropTypes.func.isRequired,
-  children: PropTypes.any.isRequired,
+  onNextPage: PropTypes.func,
 };

@@ -1,137 +1,112 @@
 import { Component } from 'react';
+import { Notify } from 'notiflix';
 import axios from 'axios';
-import Notiflix from 'notiflix';
-import PropTypes from 'prop-types';
 
-import { ImageGallery } from './ImageGallery/ImageGallery';
+import s from './App.module.css';
+
 import { Searchbar } from './Searchbar/Searchbar';
-import { AppBlock } from './App.styled';
+import { ImageGallery } from './ImageGallery/ImageGallery';
+import { Button } from './Button/Button';
 import { Loader } from './Loader/Loader';
 import { Modal } from './Modal/Modal';
-import { SelectedModalWindowImage } from './ImageGallery/ImageGallery.styled';
-import { Button } from './Button/Button';
 
-axios.defaults.baseURL = 'https://pixabay.com/api';
+const fetchHitsByQuery = async (query, page) => {
+  const response = await axios.get('https://pixabay.com/api/', {
+    method: 'get',
+    params: {
+      key: '34825583-0fd8256ee4b8b333aae97f289',
+      q: query,
+      image_type: 'photo',
+      orientation: 'horizontal',
+      safesearch: true,
+      per_page: 12,
+      page: page,
+    },
+  });
+  return response.data.hits;
+};
+
 export class App extends Component {
-  state = {
-    showModal: false,
-    searchValue: '',
-    requestData: [],
-    page: null,
-    loading: false,
+  constructor() {
+    super();
+    this.state = {
+      images: [],
+      query: '',
+      page: 1,
+      isLoading: false,
+      showBtn: false,
+      showModal: false,
+      largeImageURL: '',
+      error: null,
+    };
+  }
+
+  onSubmit = e => {
+    e.preventDefault();
+    this.setState({
+      query: e.target.search.value,
+      isLoading: true,
+      images: [],
+    });
+    this.fetchGallery(e.target.search.value, this.state.page);
   };
 
-  toggleModal = () => {
-    this.setState(({ showModal }) => ({
-      showModal: !showModal,
-    }));
-  };
-  onClickImg = largeURL => {
-    this.toggleModal();
-    this.setState({ largeModalImgURL: largeURL });
+  onNextPage = () => {
+    this.setState({
+      page: this.state.page + 1,
+      isLoading: true,
+    });
+    this.fetchGallery(this.state.query, this.state.page + 1);
   };
 
-  loadMore = () => {
-    this.setState({ loading: true });
-    this.setState(prevState => ({ page: prevState.page + 1 }));
+  onClickImage = url => {
+    this.setState({ showModal: true, largeImageURL: url });
   };
 
-  normalizeResponse = response => {
-    const normalizeData = response.data.hits.map(
-      ({ webformatURL, id, largeImageURL }) => ({
-        id: id,
-        webURL: webformatURL,
-        largeURL: largeImageURL,
-      })
-    );
-
-    return normalizeData;
+  onModalClose = () => {
+    this.setState({ showModal: false, largeImageURL: '' });
   };
 
-  async componentDidUpdate(prevProps, prevState) {
-    const prevSearchValue = prevState.searchValue;
-    const nextSearchValue = this.state.searchValue;
-    if (
-      prevSearchValue !== nextSearchValue ||
-      prevState.page !== this.state.page
-    ) {
-      try {
-        const response = await axios.get('/', {
-          params: {
-            q: nextSearchValue,
-            key: '31452049-9028b927189bb89bc78a16cd7',
-            page: this.state.page,
-            per_page: 12,
-          },
-        });
-
-        if (!response.data.totalHits) {
-          Notiflix.Notify.warning(`Нічого не знайдено, спробуйте ще`);
-          return;
-        }
-
-        this.setState({ totalHits: response.data.totalHits });
-        const data = this.normalizeResponse(response);
-        this.setState(prevState => ({
-          requestData: [...prevState.requestData, ...data],
-        }));
-      } catch (error) {
-      } finally {
-        this.setState({
-          loading: false,
-        });
+  async fetchGallery(query, page) {
+    try {
+      const response = await fetchHitsByQuery(query, page);
+      this.setState(prevState => {
+        return {
+          images: [...prevState.images, ...response],
+        };
+      });
+      if (response.length < 12) {
+        this.setState({ showBtn: false });
       }
+      if (response.length === 12) {
+        this.setState({ showBtn: true });
+      }
+      if (response.length === 0) {
+        Notify.failure('No matches found!');
+      }
+    } catch (error) {
+      this.setState({ error });
+    } finally {
+      this.setState({ isLoading: false });
     }
   }
 
-  handleSubmitSearchBar = searchValue => {
-    if (searchValue === '') {
-      Notiflix.Notify.warning(`Ви не ввели жодного запиту`);
-    }
-
-    this.setState({
-      searchValue: searchValue,
-      requestData: [],
-      page: 1,
-      loading: true,
-      showModal: false,
-      totalHits: 0,
-    });
-  };
-
   render() {
-    const { requestData, showModal, totalHits, page, loading } = this.state;
+    const { images, isLoading, showBtn, showModal, largeImageURL } = this.state;
 
     return (
-      <AppBlock>
-        <Searchbar onSubmit={this.handleSubmitSearchBar} />
-        {requestData.length > 0 && (
-          <ImageGallery
-            toggle={this.toggleModal}
-            requestData={requestData}
-            largeImageURL={this.onClickImg}
+      <div className={s.App}>
+        <Searchbar onSubmit={this.onSubmit} />
+        <ImageGallery images={images} onClickImage={this.onClickImage} />
+        {isLoading && <Loader />}
+        {showBtn && <Button onNextPage={this.onNextPage} />}
+        {showModal && (
+          <Modal
+            largeImageURL={largeImageURL}
+            onModalClose={this.onModalClose}
           />
         )}
-        {loading && <Loader />}
-        {totalHits > 12 * page && totalHits && !loading && (
-          <Button onClick={this.loadMore}>Load More</Button>
-        )}
-
-        {showModal && (
-          <Modal onClose={this.toggleModal}>
-            <SelectedModalWindowImage
-              src={this.state.largeModalImgURL}
-              alt=""
-            />
-            <Button onClick={this.toggleModal}>Close</Button>
-          </Modal>
-        )}
-      </AppBlock>
+      </div>
     );
   }
 }
-
-App.propTypes = {
-  onSubmit: PropTypes.string.isRequired,
-  searchValue: PropTypes.string.isRequired,
-};
