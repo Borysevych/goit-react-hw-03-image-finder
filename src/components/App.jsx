@@ -1,6 +1,5 @@
 import { Component } from 'react';
 import { Notify } from 'notiflix';
-import axios from 'axios';
 
 import s from './App.module.css';
 
@@ -9,22 +8,8 @@ import { ImageGallery } from './ImageGallery/ImageGallery';
 import { Button } from './Button/Button';
 import { Loader } from './Loader/Loader';
 import { Modal } from './Modal/Modal';
+import { fetchHitsByQuery } from '../services/Api';
 
-const fetchHitsByQuery = async (query, page) => {
-  const response = await axios.get('https://pixabay.com/api/', {
-    method: 'get',
-    params: {
-      key: '34825583-0fd8256ee4b8b333aae97f289',
-      q: query,
-      image_type: 'photo',
-      orientation: 'horizontal',
-      safesearch: true,
-      per_page: 12,
-      page: page,
-    },
-  });
-  return response.data.hits;
-};
 
 export class App extends Component {
   constructor() {
@@ -46,9 +31,10 @@ export class App extends Component {
     this.setState({
       query: e.target.search.value,
       isLoading: true,
+      page: 1,
       images: [],
     });
-    this.fetchGallery(e.target.search.value, this.state.page);
+    this.fetchGallery(e.target.search.value, 1);
   };
 
   onNextPage = () => {
@@ -96,8 +82,8 @@ export class App extends Component {
 
     return (
       <div className={s.App}>
-        <Searchbar onSubmit={this.onSubmit} />
-        <ImageGallery images={images} onClickImage={this.onClickImage} />
+        <Searchbar onSubmit={this.onSubmit} onSearchChange={this.onSearchChange} />
+        <ImageGallery images={images} />
         {isLoading && <Loader />}
         {showBtn && <Button onNextPage={this.onNextPage} />}
         {showModal && (
