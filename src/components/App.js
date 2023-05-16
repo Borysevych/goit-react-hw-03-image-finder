@@ -10,7 +10,6 @@ import { Loader } from './Loader/Loader';
 import { Modal } from './Modal/Modal';
 import { fetchHitsByQuery } from '../services/Api';
 
-
 export class App extends Component {
   constructor() {
     super();
@@ -82,8 +81,8 @@ export class App extends Component {
 
     return (
       <div className={s.App}>
-        <Searchbar onSubmit={this.onSubmit} onSearchChange={this.onSearchChange} />
-        <ImageGallery images={images} />
+        <Searchbar onSubmit={this.onSubmit} />
+        <ImageGallery images={images} onClickImage={this.onClickImage} />
         {isLoading && <Loader />}
         {showBtn && <Button onNextPage={this.onNextPage} />}
         {showModal && (
